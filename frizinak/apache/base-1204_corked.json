@@ -1,0 +1,4 @@
+{
+  "from": "frizinak/ubuntu:base-1204",
+  "instructions": "INCLUDE apache.instructions"
+}

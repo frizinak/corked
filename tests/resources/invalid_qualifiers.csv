@@ -1,0 +1,9 @@
+frizinak/subdir/subdir,0
+frizinak:tag:tag,3
+too/short:tag,1
+#####/invalid-chars:tag,1
+invalidchars/#######:tag,2
+invalidchars/name:###,3
+short/tags-are-too-short:t,3
+waytoolooooongdwqdqwdkqlwdwqkdqwkldjqkwldjkqlkwd/name:tag,1
+dockerdontcare/but-we-do:tags-should-be-limited-to-30-characters,3

@@ -1,0 +1,19 @@
+{
+  "from": "ubuntu:14.04",
+  "instructions": [
+    "INCLUDE base.instructions"
+  ],
+  "tokens": {
+    "sudo_user": {
+      "name": "corked",
+      "homedir": "/home/corked",
+      "passwd": "corked"
+    },
+    "supervisor": {
+      "confdir": "/etc/supervisor/conf.d"
+    },
+    "ubuntu": {
+      "version_specific_packages": "software-properties-common"
+    }
+  }
+}

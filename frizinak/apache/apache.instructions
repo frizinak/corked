@@ -1,0 +1,5 @@
+RUN id -u www-data || useradd -s /bin/bash www-data
+RUN sudo apt-get -qqy install apache2
+COPY apache.supervisor.conf {{ supervisor.confdir }}/apache.conf
+
+EXPOSE 80

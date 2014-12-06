@@ -1,0 +1,10 @@
+{
+  "from":         "frizinak/name-dir:tag-dir",
+  "instructions": [
+    "apt-get update",
+    [
+      "echo {{ ubuntu.version_specific_packages }} &&",
+      "echo 'xx'"
+    ]
+  ]
+}

@@ -1,0 +1,19 @@
+#! /usr/bin/env php
+<?php
+
+set_time_limit(0);
+
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+use Frizinak\Corked\Command\BuildCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+$commands = array(
+    new BuildCommand(),
+);
+
+$application = new Application('Docker');
+$application->addCommands($commands);
+$application->run(new ArgvInput());
+

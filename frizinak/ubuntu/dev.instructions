@@ -1,0 +1,18 @@
+RUN    mkdir ~/.ssh
+RUN    mkdir /etc/ssh || true
+
+RUN    sudo apt-get -qqy install ssh
+RUN    sudo mkdir /var/run/sshd
+
+# User key
+COPY   id_rsa.pub {{ sudo_user.homedir }}/.ssh/corked_id.pub
+RUN    cat ~/.ssh/corked_id.pub >> ~/.ssh/authorized_keys && rm ~/.ssh/corked_id.pub
+
+# Host keys
+ADD    ssh_host/* /etc/ssh/
+RUN    sudo chmod 600 /etc/ssh/ssh_host*
+
+COPY   sshd.supervisor.conf {{ supervisor.confdir }}/sshd.conf
+COPY   sshd_config /etc/ssh/sshd_config
+
+EXPOSE 22

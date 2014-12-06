@@ -1,0 +1,8 @@
+{
+  "images": [
+    "frizinak/apache-php:dev-55",
+    "frizinak/apache-php:dev-54",
+    "frizinak/apache-php:dev-53",
+    "frizinak/mysql:dev-55"
+  ]
+}
