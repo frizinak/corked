@@ -11,7 +11,6 @@ $phar->addFromString('bin/corked', preg_replace('/^#!.*(\n|$)/', '', file_get_co
 
 $phar->setStub(<<<'nowdoc'
 #! /usr/bin/env php
-
 <?php
 Phar::mapPhar('corked.phar');
 require 'phar://corked.phar/bin/corked';
