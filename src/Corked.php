@@ -70,6 +70,10 @@ class Corked
             'instructions.tokenresolver',
         );
 
+        $this->container['decoders'] = array(
+            'corked.json' => 'decoder.json',
+        );
+
         $params += array('lookup_paths' => array());
         $this->container['dependency.fileresolver.lookup_paths'] = $params['lookup_paths'];
 
@@ -91,7 +95,9 @@ class Corked
 
         $this->container['dependency.fileresolver'] = function ($cntnr) {
             $resolver = new FileResolver();
-            $resolver->addDecoder('corked.json', $cntnr['decoder.json']);
+            foreach ($cntnr['decoders'] as $filename => $decoder) {
+                $resolver->addDecoder($filename, $cntnr[$decoder]);
+            }
             foreach ($cntnr['dependency.fileresolver.lookup_paths'] as $lookupPath) {
                 $resolver->addLookupPath($lookupPath);
             }

@@ -5,6 +5,7 @@ namespace Frizinak\Corked\Command;
 
 use Frizinak\Corked\Adapter\Docker\CLIAdapter;
 use Frizinak\Corked\Corked;
+use Frizinak\Corked\Exception\RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,5 +54,22 @@ abstract class AbstractCommand extends Command
     protected function getDockerClient()
     {
         return $this->input->getOption('docker-client');
+    }
+
+    protected function findCorked(Corked $corked)
+    {
+        foreach ($corked->get('decoders') as $filename => $decoder) {
+            $corkedFilePath = $this->getBasePath() . DIRECTORY_SEPARATOR . $filename;
+            if (!file_exists($corkedFilePath)) {
+                continue;
+            }
+
+            if (($data = @file_get_contents($corkedFilePath)) === false) {
+                throw new RuntimeException(sprintf('%s could not be read', $corkedFilePath));
+            }
+
+            return $corked->get($decoder)->decode($data);
+        }
+        throw new RuntimeException(sprintf('No corked file could be found in %s', $this->getBasePath()));
     }
 }
