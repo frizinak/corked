@@ -17,10 +17,12 @@ abstract class AbstractCommand extends Command
 
     /** @var  InputInterface */
     protected $input;
+    protected $basePath;
+    protected $corkedPath;
 
     protected function configure()
     {
-        $this->addArgument('base-path', InputArgument::OPTIONAL, 'path to project dir (where your main corked file resides).', getcwd())
+        $this->addArgument('base-path', InputArgument::OPTIONAL, 'path to project dir or a corked file.', getcwd())
              ->addOption('docker-client', 'd', InputOption::VALUE_OPTIONAL, 'path to `docker`.', 'docker');
     }
 
@@ -34,6 +36,9 @@ abstract class AbstractCommand extends Command
     {
         $paths = array();
         if ($basePath = $this->getBasePath()) {
+            if (is_file($basePath)) {
+                $basePath = dirname($basePath);
+            }
             $paths[] = $basePath;
         }
 
@@ -48,7 +53,23 @@ abstract class AbstractCommand extends Command
 
     protected function getBasePath()
     {
-        return $this->input->getArgument('base-path');
+        if (!$this->basePath) {
+            $this->basePath = $basePath = $this->input->getArgument('base-path');
+            if (is_file($basePath)) {
+                $this->basePath = dirname($basePath);
+                $this->corkedPath = $basePath;
+            }
+        }
+        return $this->basePath;
+    }
+
+    protected function getCorkedPath()
+    {
+        if (!$this->corkedPath) {
+            $this->getBasePath();
+        }
+
+        return $this->corkedPath;
     }
 
     protected function getDockerClient()
@@ -60,6 +81,13 @@ abstract class AbstractCommand extends Command
     {
         foreach ($corked->get('decoders') as $filename => $decoder) {
             $corkedFilePath = $this->getBasePath() . DIRECTORY_SEPARATOR . $filename;
+            if ($specifiedPath = $this->getCorkedPath()) {
+                if (!preg_match('/' . preg_quote($filename, '/') . '$/', $specifiedPath)) {
+                    continue;
+                }
+                $corkedFilePath = $specifiedPath;
+            }
+
             if (!file_exists($corkedFilePath)) {
                 continue;
             }
