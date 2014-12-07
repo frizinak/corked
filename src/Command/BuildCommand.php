@@ -62,6 +62,7 @@ class BuildCommand extends AbstractCommand
             $this->progressBar = new ProgressBar($output);
             $this->progressBar->setBarWidth($this->progressBarWidth);
             $this->progressBar->setEmptyBarCharacter(' ');
+            $this->progressBar->setBarCharacter(' ');
             $this->progressBar->setProgressCharacter('<fg=green>⬤</fg=green>');
             $this->progressBar->setMessage('?/?', 'overall');
             $this->progressBar->setMessage('?/?', 'progress');
@@ -87,8 +88,8 @@ class BuildCommand extends AbstractCommand
         $toBuild = count($images);
         foreach ($images as $cork) {
             $current && $output->write("\n\n\n");
+            $progress->start();
             $progress->setMessage(sprintf('%d/%d', ++$current, $toBuild), 'overall');
-
             $callback = function ($depth, Cork $cork, $stdOut, $stdErr) use ($isVebose, $progress, $output, &$maxDepth) {
                 $maxDepth = max($maxDepth, $depth);
                 if ($this->interrupted) {
@@ -104,6 +105,7 @@ class BuildCommand extends AbstractCommand
             };
 
             $cork->build($input->getOption('no-cache'), $callback);
+            $progress->finish();
         }
 
         $output->writeln("\n" . '<info>Success</info>');
