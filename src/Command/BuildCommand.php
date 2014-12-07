@@ -3,44 +3,29 @@
 
 namespace Frizinak\Corked\Command;
 
-use Frizinak\Corked\Adapter\Docker\CLIAdapter;
 use Frizinak\Corked\Cork\Cork;
-use Frizinak\Corked\Corked;
 use Frizinak\Corked\Decoder\JsonDecoder;
 use Frizinak\Corked\Exception\RuntimeException;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BuildCommand extends Command
+class BuildCommand extends AbstractCommand
 {
 
-    protected $client;
     protected $pcntl;
     protected $interrupted;
     protected $progressBarWidth = 39;
 
-    public function __construct()
-    {
-        ProgressBar::setFormatDefinition(
-            'normal_nomax',
-            "<fg=white;bg=green;option=bold> %overall:-7s% %message:50s% </fg=white;bg=green;option=bold> \n %progress% %elapsed:15s% %bar%"
-        );
-
-        parent::__construct('Corked');
-    }
-
     protected function configure()
     {
         $this->setName('build')
-             ->addArgument('base-path', InputArgument::OPTIONAL, 'path to project dir (where your main corked file resides).', getcwd())
-             ->addOption('docker-client', 'd', InputOption::VALUE_OPTIONAL, 'path to `docker`.', 'docker')
              ->addOption('no-cache', null, InputOption::VALUE_NONE, 'Skip docker cache, i.e., rebuild all images.')
              ->addOption('include-path', 'i', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'local repo include paths.')
              ->setDescription('Build images from a corked.json');
+
+        parent::configure();
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -60,27 +45,26 @@ class BuildCommand extends Command
             $output->writeln('<comment>We need to create an intermediate Dockerfile inside each context dir.</comment>');
             $output->writeln('<comment>The pcntl signal trap allows us to clean up if the build was interrupted.</comment>' . "\n");
         }
+
+        ProgressBar::setFormatDefinition(
+            'normal_nomax',
+            "<fg=white;bg=green;option=bold> %overall:-7s% %message:50s% </fg=white;bg=green;option=bold> \n %progress% %elapsed:15s% %bar%"
+        );
+
+        parent::initialize($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $paths = (array) $input->getOption('include-path');
-        if ($corkedPath = $input->getArgument('base-path')) {
-            $paths[] = $corkedPath;
-        }
+        $corkedFilePath = $this->getBasePath() . DIRECTORY_SEPARATOR . 'corked.json';
 
-        if ($dockerPathEnv = getenv('DOCKER_PATH')) {
-            $paths = array_merge($paths, explode(':', $dockerPathEnv));
-        }
-
-        $corkedFilePath = $corkedPath . DIRECTORY_SEPARATOR . 'corked.json';
-
-        $corked = new Corked(array('lookup_paths' => $paths));
+        $corked = $this->getCorked(array('lookup_paths' => $paths));
         /** @var JsonDecoder $jsonDecoder */
         $jsonDecoder = $corked->get('decoder.json');
 
         if (!file_exists($corkedFilePath)) {
-            throw new RuntimeException(sprintf('No corked.json file could be found %s', $corkedPath));
+            throw new RuntimeException(sprintf('No corked.json file could be found %s', $this->getBasePath()));
         }
 
         if (($data = @file_get_contents($corkedFilePath)) === false) {
@@ -96,18 +80,20 @@ class BuildCommand extends Command
             $progress->setBarWidth($this->progressBarWidth);
             $progress->setEmptyBarCharacter(' ');
             $progress->setProgressCharacter('<fg=green>⬤</fg=green>');
+            $progress->setMessage('?/?', 'overall');
+            $progress->setMessage('?/?', 'progress');
+            $progress->setMessage('');
         }
 
         $projectCork = $factory->createRoot($jsonDecoder->decode($data));
 
-        CLIAdapter::setCli($input->getOption('docker-client'));
         $maxDepth = 0;
         $images = $projectCork->getDependents();
         $toBuild = count($images);
         $current = 0;
         foreach ($images as $cork) {
             if ($progress) {
-                $progress->start();
+                $current && $output->write("\n\n\n");
                 $progress->setMessage(sprintf('%d/%d', ++$current, $toBuild), 'overall');
             }
 
