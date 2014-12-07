@@ -1,4 +1,4 @@
 {
-  "from": "frizinak/ubuntu:base-1404",
+  "from":         "frizinak/ubuntu:base-1404",
   "instructions": "INCLUDE dev.instructions"
 }

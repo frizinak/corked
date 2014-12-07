@@ -33,6 +33,12 @@ class CLIAdapter implements AdapterInterface
         return false;
     }
 
+    public function images($all = false, $query = '')
+    {
+        $command = new ImagesCommand(static::$cli);
+        return $command->execute($all, $query);
+    }
+
     /**
      * @inheritdoc
      */
@@ -51,6 +57,12 @@ class CLIAdapter implements AdapterInterface
         return false;
     }
 
+    public function search($query)
+    {
+        $command = new SearchCommand(static::$cli);
+        return $command->execute($query);
+    }
+
     /**
      * @inheritdoc
      */
@@ -66,19 +78,7 @@ class CLIAdapter implements AdapterInterface
     public function build($qualifier, $dockerFileContents, $path, \Closure $callback = null, $skipCache = false)
     {
         $command = new BuildCommand(static::$cli);
-        $command->execute($qualifier, $dockerFileContents, $path, $callback,$skipCache);
-    }
-
-    public function images($all = false, $query = '')
-    {
-        $command = new ImagesCommand(static::$cli);
-        return $command->execute($all, $query);
-    }
-
-    public function search($query)
-    {
-        $command = new SearchCommand(static::$cli);
-        return $command->execute($query);
+        $command->execute($qualifier, $dockerFileContents, $path, $callback, $skipCache);
     }
 
     protected function getBuilder()

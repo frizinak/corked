@@ -1,5 +1,5 @@
 {
-  "from": "frizinak/apache:dev-1204",
+  "from":         "frizinak/apache:dev-1204",
   "instructions": [
     "RUN  sudo add-apt-repository ppa:ondrej/php5-oldstable",
     "#    Flush caches",
@@ -14,7 +14,7 @@
     "RUN  sudo a2enmod cgi",
     "RUN  sudo php5enmod xhprof"
   ],
-  "tokens": {
+  "tokens":       {
     "xhprof": {"version": "0.9.4"}
   }
 }

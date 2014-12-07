@@ -18,7 +18,6 @@ class CorkFactory implements CorkFactoryInterface
         $this->instructionsResolver = $instructionsResolver;
     }
 
-
     /**
      * @inheritdoc
      */
