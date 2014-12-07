@@ -5,6 +5,7 @@ namespace Frizinak\Corked;
 
 use Frizinak\Corked\Cork\CorkFactory;
 use Frizinak\Corked\Decoder\JsonDecoder;
+use Frizinak\Corked\Decoder\YamlDecoder;
 use Frizinak\Corked\DependencyResolver\FileResolver;
 use Frizinak\Corked\DependencyResolver\HubImageResolver;
 use Frizinak\Corked\DependencyResolver\LocalImageResolver;
@@ -71,6 +72,7 @@ class Corked
         );
 
         $this->container['decoders'] = array(
+            'corked.yml' => 'decoder.yaml',
             'corked.json' => 'decoder.json',
         );
 
@@ -82,6 +84,10 @@ class Corked
         $this->container['decoder.json'] = $this->container->factory(function () {
             // Factory? if not the methods should prolly be static.
             return new JsonDecoder();
+        });
+
+        $this->container['decoder.yaml'] = $this->container->factory(function () {
+            return new YamlDecoder();
         });
 
         // -- Dependency resolving
