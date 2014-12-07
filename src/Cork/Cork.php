@@ -13,6 +13,7 @@ use Frizinak\Corked\Definition\TokensDefinition;
 use Frizinak\Corked\DependencyResolver\Resolver as DependencyResolver;
 use Frizinak\Corked\Exception\ExceptionInterface;
 use Frizinak\Corked\InstructionsResolver\Resolver as InstructionsResolver;
+use Frizinak\Corked\TokensResolver\Resolver as TokensResolver;
 
 /**
  * DefinitionBag containing all information necessary to build a docker image.
@@ -26,15 +27,18 @@ class Cork extends DefinitionBag
 
     protected $dependencyResolver;
     protected $instructionsResolver;
+    protected $tokensResolver;
     protected $factory;
 
     public function __construct(
         DependencyResolver $dependencyResolver = null,
         InstructionsResolver $instructionResolver = null,
+        TokensResolver $tokensResolver = null,
         CorkFactoryInterface $factory = null
     ) {
         $this->dependencyResolver = $dependencyResolver;
         $this->instructionsResolver = $instructionResolver;
+        $this->tokensResolver = $tokensResolver;
         $this->factory = $factory;
 
         foreach ($this->baseDefinitions() as $definition) {
@@ -71,16 +75,14 @@ class Cork extends DefinitionBag
      */
     public function getTokens()
     {
-        if (!$this->tokens) {
-            $tokens = (array) $this->getDefinition('tokens')->getValue();
-            if ($dependent = $this->getDependent()) {
-                $tokens += (array) $dependent->getTokens();
-            }
-
-            $this->tokens = $tokens;
+        $def = $this->getDefinition('tokens');
+        if ($def->isFrozen()) {
+            return $def->getValue();
         }
 
-        return $this->tokens;
+        $this->tokensResolver->resolve($this);
+
+        return $def->freeze()->getValue();
     }
 
     /**

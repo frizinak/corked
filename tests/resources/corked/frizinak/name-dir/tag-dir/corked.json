@@ -24,6 +24,7 @@
     },
     "ubuntu":     {
       "version_specific_packages": "python-software-properties"
-    }
+    },
+    "inherited":  "{{ ubuntu.version_specific_packages }}-lala"
   }
 }

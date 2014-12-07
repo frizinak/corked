@@ -1,4 +1,10 @@
 {
   "from":         "frizinak/name-dir:tag-file",
-  "instructions": []
+  "instructions": ["RUN {{ deep.token }}"],
+  "tokens":       {
+    "deep": {
+      "token": "{{ deep.token2 }}",
+      "token2": "{{ inherited }}"
+    }
+  }
 }

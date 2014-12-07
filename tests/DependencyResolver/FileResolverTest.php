@@ -5,6 +5,7 @@ namespace Frizinak\CorkedTest\DependencyResolver;
 
 use Frizinak\Corked\Cork\Cork;
 use Frizinak\Corked\Decoder\JsonDecoder;
+use Frizinak\Corked\Decoder\YamlDecoder;
 use Frizinak\Corked\DependencyResolver\FileResolver;
 
 class FileResolverTest extends \PHPUnit_Framework_TestCase
@@ -12,9 +13,9 @@ class FileResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function getResolver()
     {
-        $decoder = new JsonDecoder();
         $resolver = new FileResolver();
-        $resolver->addDecoder('corked.json', $decoder);
+        $resolver->addDecoder('corked.json', new JsonDecoder());
+        $resolver->addDecoder('corked.yml', new YamlDecoder());
         return $resolver;
     }
 

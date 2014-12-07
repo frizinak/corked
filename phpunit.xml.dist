@@ -5,6 +5,11 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <groups>
+        <exclude>
+            <group>system</group>
+        </exclude>
+    </groups>
     <filter>
         <whitelist>
             <directory>./src</directory>

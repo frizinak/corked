@@ -13,7 +13,10 @@ use Frizinak\Corked\DependencyResolver\Resolver as DependencyResolver;
 use Frizinak\Corked\Exception\RuntimeException;
 use Frizinak\Corked\InstructionsResolver\IncludeResolver;
 use Frizinak\Corked\InstructionsResolver\Resolver as InstructionsResolver;
-use Frizinak\Corked\InstructionsResolver\TokenResolver;
+use Frizinak\Corked\InstructionsResolver\TokenResolver as InstructionsTokenResolver;
+use Frizinak\Corked\TokensResolver\InheritanceResolver;
+use Frizinak\Corked\TokensResolver\Resolver as TokensResolver;
+use Frizinak\Corked\TokensResolver\TokenResolver as TokensTokenResolver;
 use Pimple\Container;
 
 class Corked
@@ -69,6 +72,11 @@ class Corked
             'instructions.tokenresolver',
             'instructions.includeresolver',
             'instructions.tokenresolver',
+        );
+
+        $this->container['tokens.resolvers'] = array(
+            'tokens.inheritanceresolver',
+            'tokens.tokenresolver',
         );
 
         $this->container['decoders'] = array(
@@ -128,16 +136,37 @@ class Corked
         };
 
         $this->container['instructions.tokenresolver'] = $this->container->factory(function () {
-            return new TokenResolver();
+            return new InstructionsTokenResolver();
         });
 
         $this->container['instructions.includeresolver'] = $this->container->factory(function () {
             return new IncludeResolver();
         });
 
+        // -- Tokens resolving
+        $this->container['tokens.resolver'] = function ($cntnr) {
+            $tokensResolver = new TokensResolver();
+            foreach ($cntnr['tokens.resolvers'] as $resolver) {
+                $tokensResolver->addResolver($cntnr[$resolver]);
+            }
+            return $tokensResolver;
+        };
+
+        $this->container['tokens.tokenresolver'] = function () {
+            return new TokensTokenResolver();
+        };
+
+        $this->container['tokens.inheritanceresolver'] = function () {
+            return new InheritanceResolver();
+        };
+
         // -- Corkfactory
         $this->container['corkfactory'] = function ($cntnr) {
-            return new CorkFactory($cntnr['dependency.resolver'], $cntnr['instructions.resolver']);
+            return new CorkFactory(
+                $cntnr['dependency.resolver'],
+                $cntnr['instructions.resolver'],
+                $cntnr['tokens.resolver']
+            );
         };
     }
 }
