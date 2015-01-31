@@ -4,7 +4,7 @@
     "INCLUDE base.instructions"
   ],
   "tokens":       {
-    "sudo_user":  {
+    "cork_user":  {
       "name":    "corked",
       "homedir": "/home/corked",
       "passwd":  "corked"

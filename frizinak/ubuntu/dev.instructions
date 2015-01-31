@@ -1,16 +1,23 @@
-RUN    mkdir ~/.ssh
+RUN    mkdir /etc/sudoers.d || true
+RUN    echo "{{ cork_user.name }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ cork_user.name }}
+RUN    chmod 440 /etc/sudoers.d/{{ cork_user.name }}
+
+RUN    mkdir {{ cork_user.homedir }}/.ssh
 RUN    mkdir /etc/ssh || true
 
-RUN    sudo apt-get -qqy install ssh
-RUN    sudo mkdir /var/run/sshd
+RUN    apt-get update
+RUN    apt-get -qqy install ssh
+RUN    mkdir /var/run/sshd
 
 # User key
-COPY   id_rsa.pub {{ sudo_user.homedir }}/.ssh/corked_id.pub
-RUN    cat ~/.ssh/corked_id.pub >> ~/.ssh/authorized_keys && rm ~/.ssh/corked_id.pub
+COPY   id_rsa.pub {{ cork_user.homedir }}/.ssh/corked_id.pub
+RUN    cat {{ cork_user.homedir }}/.ssh/corked_id.pub >> {{ cork_user.homedir }}/.ssh/authorized_keys && \
+       rm {{ cork_user.homedir }}/.ssh/corked_id.pub
+RUN    chown -R {{ cork_user.name }} {{ cork_user.homedir }}/.ssh 
 
 # Host keys
 ADD    ssh_host/* /etc/ssh/
-RUN    sudo chmod 600 /etc/ssh/ssh_host*
+RUN    chmod 600 /etc/ssh/ssh_host*
 
 COPY   sshd.supervisor.conf {{ supervisor.confdir }}/sshd.conf
 COPY   sshd_config /etc/ssh/sshd_config

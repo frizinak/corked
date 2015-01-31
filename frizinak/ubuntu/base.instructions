@@ -1,13 +1,9 @@
+RUN     ulimit -n 1024
 RUN     apt-get update
 RUN     apt-get -qqy install make sudo curl git wget supervisor {{ ubuntu.version_specific_packages }}
-RUN     useradd -ms /bin/bash -d {{ sudo_user.homedir }} {{ sudo_user.name }}
-RUN     echo "{{ sudo_user.name }}:{{ sudo_user.passwd }}" | chpasswd
-RUN     mkdir /etc/sudoers.d || true
-RUN     echo "{{ sudo_user.name }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ sudo_user.name }}
-RUN     chmod 440 /etc/sudoers.d/{{ sudo_user.name }}
-RUN     su {{ sudo_user.name }}
-USER    {{ sudo_user.name }}
-ENV     HOME {{ sudo_user.homedir }}
+RUN     useradd -ms /bin/bash -d {{ cork_user.homedir }} {{ cork_user.name }}
+RUN     echo "{{ cork_user.name }}:{{ cork_user.passwd }}" | chpasswd
+ENV     HOME {{ cork_user.homedir }}
 WORKDIR ${HOME}
 COPY    supervisord.conf /etc/supervisor/supervisord.conf
-CMD     ["sudo", "supervisord"]
+CMD     ["supervisord"]

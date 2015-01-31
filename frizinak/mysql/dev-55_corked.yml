@@ -1,0 +1,24 @@
+---
+from:  frizinak/ubuntu:dev-1404
+
+instructions: |
+  RUN apt-get update && apt-get -qqy install mysql-server-5.5
+  COPY mysql.supervisor.conf {{ supervisor.confdir }}/mysql.conf
+  COPY my.cnf /etc/mysql/my.cnf
+  COPY init.sql /etc/mysql/init.sql
+
+  RUN sed -i 's/\[username\]/{{ cork_user.name }}/g' /etc/mysql/init.sql
+  RUN sed -i 's/\[password\]/{{ cork_user.passwd }}/g' /etc/mysql/init.sql
+  RUN sed -i 's/\[username\]/{{ cork_user.name }}/g' {{ supervisor.confdir }}/mysql.conf
+  RUN sed -i 's/\[init-file\]/\/etc\/mysql\/init.sql/g' {{ supervisor.confdir }}/mysql.conf
+  RUN sed -i 's/\[username\]/{{ cork_user.name }}/g' /etc/mysql/my.cnf
+  RUN sed -i 's/\[port\]/{{ mysql.port }}/g' /etc/mysql/my.cnf
+
+  RUN mkdir /var/run/mysqld || true
+  RUN chown {{ cork_user.name }} /var/run/mysqld
+
+  CMD mysql_install_db --user={{ cork_user.name }} >/dev/null && supervisord
+  EXPOSE {{ mysql.port }}
+
+tokens:
+  mysql: { port: 3306 }

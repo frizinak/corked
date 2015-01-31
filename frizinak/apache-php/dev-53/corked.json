@@ -1,11 +1,11 @@
 {
   "from":         "frizinak/apache:dev-1204",
   "instructions": [
-    "RUN  sudo apt-get -qqy install php5 php5-mcrypt",
+    "RUN  apt-get update && apt-get -qqy install php5 php5-mcrypt",
     "COPY php.ini /etc/php5/apache2/php.ini",
-    "RUN  sudo apt-get -qqy install php-pear php5-dev",
-    "RUN  sudo pecl install xhprof-{{ xhprof.version }}",
-    "RUN  sudo a2enmod cgi"
+    "RUN  apt-get -qqy install php-pear php5-dev",
+    "RUN  pecl install xhprof-{{ xhprof.version }}",
+    "RUN  a2enmod cgi"
   ],
   "tokens":       {
     "xhprof": {"version": "0.9.4"}

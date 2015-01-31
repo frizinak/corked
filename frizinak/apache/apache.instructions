@@ -1,5 +1,4 @@
-RUN id -u www-data || useradd -s /bin/bash www-data
-RUN sudo apt-get -qqy install apache2
+RUN apt-get update && apt-get -qqy install apache2
 COPY apache.supervisor.conf {{ supervisor.confdir }}/apache.conf
-
+RUN sed -i 's/\[username\]/{{ cork_user.name }}/g' {{ supervisor.confdir }}/apache.conf
 EXPOSE 80

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Frizinak\Corked\Command;
 
 use Frizinak\Corked\Cork\Cork;
@@ -21,9 +20,9 @@ class BuildCommand extends AbstractCommand
     protected function configure()
     {
         $this->setName('build')
-             ->addOption('no-cache', null, InputOption::VALUE_NONE, 'Skip docker cache, i.e., rebuild all images.')
-             ->addOption('include-path', 'i', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'local repo include paths.')
-             ->setDescription('Build images from a corked file');
+            ->addOption('no-cache', null, InputOption::VALUE_NONE, 'Skip docker cache, i.e., rebuild all images.')
+            ->addOption('include-path', 'i', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'local repo include paths.')
+            ->setDescription('Build images from a corked file');
 
         parent::configure();
     }
@@ -61,7 +60,7 @@ class BuildCommand extends AbstractCommand
             $this->progressBar = new ProgressBar($output);
             $this->progressBar->setBarWidth($this->progressBarWidth);
             $this->progressBar->setEmptyBarCharacter(' ');
-            $this->progressBar->setProgressCharacter('<fg=green>⬤</fg=green>');
+            $this->progressBar->setProgressCharacter('<fg=green>-</fg=green>');
             $this->progressBar->setMessage('?/?', 'overall');
             $this->progressBar->setMessage('?/?', 'progress');
             $this->progressBar->setMessage('');

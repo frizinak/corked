@@ -1,7 +1,0 @@
-{
-  "from":         "frizinak/ubuntu:dev-1404",
-  "instructions": [
-    "RUN sudo apt-get -qqy install mysql-server-5.5",
-    "COPY mysql.supervisor.conf {{ supervisor.confdir }}/mysql.conf"
-  ]
-}
